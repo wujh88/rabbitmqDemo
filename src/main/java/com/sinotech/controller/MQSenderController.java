@@ -33,7 +33,11 @@ public class MQSenderController {
     public JSONObject testRMQ(@RequestBody String xml) {
         JSONObject json = new JSONObject();
         try {
-            this.rabbitTemplate.convertAndSend("sinoPay_async_key", xml);
+            int i=0;
+            while (i<100) {
+                this.rabbitTemplate.convertAndSend("sinoPay_async_key", xml);
+                i++;
+            }
             json = ResultPackaging.responseSuccess();
         } catch (Exception e) {
             LOGGER.error(LogUtil.format("支付平台回调MQ","回调参数加入MQ出现异常",xml,e.getMessage()));
