@@ -1,6 +1,7 @@
 package com.sinotech.controller;
 
 import com.sinotech.common.ResultPackaging;
+import com.sinotech.util.JsonUtil;
 import com.sinotech.util.log.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,18 +54,35 @@ public class MQSenderController {
     @RequestMapping("/testN1")
     @ResponseBody
     public JSONObject testN1(@RequestBody String xml) {
+        JSONObject xmlJson = JsonUtil.toJSONObject(xml);
         JSONObject json = new JSONObject();
         try {
-            this.rabbitTemplate.convertAndSend("test_queue_priority", (Object) xml, new MessagePostProcessor() {
-                @Override
-                public Message postProcessMessage(Message message) throws AmqpException {
-                    message.getMessageProperties().setPriority(1);
-                    return message;
+            int i=0,j=1;
+            while (i<100) {
+                j= i%7==0 ? 3:1;
+                xmlJson.put("j",j);
+                if(j==1){
+                this.rabbitTemplate.convertAndSend("test_queue_priority", (Object) xmlJson.toString(), new MessagePostProcessor() {
+                    @Override
+                    public Message postProcessMessage(Message message) throws AmqpException {
+                        message.getMessageProperties().setPriority(1);
+                        return message;
+                    }
+                });
+                } else {
+                    this.rabbitTemplate.convertAndSend("test_queue_priority", (Object) xmlJson.toString(), new MessagePostProcessor() {
+                        @Override
+                        public Message postProcessMessage(Message message) throws AmqpException {
+                            message.getMessageProperties().setPriority(3);
+                            return message;
+                        }
+                    });
                 }
-            });
+                i++;
+            }
             json = ResultPackaging.responseSuccess();
         } catch (Exception e) {
-            LOGGER.error(LogUtil.format("结算平台业务请求MQ","参数加入MQ出现异常",xml,e.getMessage()));
+            LOGGER.error(LogUtil.format("结算平台业务请求MQ","参数加入MQ出现异常",xmlJson.toString(),e.getMessage()));
         }
         return json;
     }
