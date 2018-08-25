@@ -412,7 +412,7 @@ public class HttpClient {
 
 	public static void main(String[] args) throws Exception {
 		String jString = "{\"merchant_id\":\"2001000038\",\"sign\":\"wewe\",\"tf_timestamp\":\"20170704182546\",\"service_id\":\"payQuery\",\"terminal\":\"pc\",\"businessnumber\":\"35910111149\"}";
-		String url = "http://61.175.198.100:18088/core/payQuery";
+		String url = "http://2.3.4.6:18088/core/payQuery";
 		String returnstr = sendHttpPostJson(url, jString);
 		System.out.println("Result :->" + returnstr);
 	}
